@@ -1,0 +1,78 @@
+---
+- name: Setup Docker on Remote-server
+  hosts: MongodbServer
+  gather_facts: false
+  become: yes
+  tasks:
+    - name: Upate package manager and install python3
+      # vars:
+      #   ansible_python_interpreter: /usr/bin/python
+      ansible.builtin.apt:
+        name:
+          - python3
+        update_cache: yes
+        state: present
+    - name: install Docker
+      # vars:
+      #   ansible_python_interpreter: /usr/bin/python
+      ansible.builtin.apt:
+        name:
+          - docker
+          - docker-compose
+          - pip
+        state: present
+    # - name: downnload and install Docekr compose
+    #   ansible.builtin.get_url:
+    #     url: "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-{{lookup('pipe','uname -m')}}"
+    #     dest: /usr/local/bin/docker-compose
+    #     mode: +x
+    - name: install docker-python
+      ansible.builtin.pip:
+        name: 
+        - docker
+        - docker-compose
+
+- name: start Docker service
+  hosts: MongodbServer
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Make sure Docker service unit is running
+      ansible.builtin.systemd:
+        state: started
+        name: docker
+
+- name: Add user to Docker Group
+  hosts: MongodbServer
+  become: yes
+  gather_facts: false
+  tasks:
+    - name: Add User to Group
+      ansible.builtin.user:
+        user: ubuntu
+        group: docker
+    - name: Reset connection
+      ansible.builtin.meta: reset_connection
+
+- name: Setup and run Compose-file
+  hosts: MongodbServer
+  become: yes
+  become_user: ubuntu
+  gather_facts: false
+  vars_files:
+    - vars_dockercompose
+  tasks:
+    - name: Copy docker compose-file
+      ansible.builtin.copy:
+        src: "{{ file_path }}"
+        dest: "{{ remote_home_dir }}"
+    # - name: docker login
+    #   community.docker.docker_login: 
+    #     registry_url: "{{ registry_url }}"
+    #     username: "{{ username }}"
+    #     password: "{{ password }}"
+    #     reauthorize: yes
+    - name: start containers
+      community.docker.docker_compose:
+        project_src: "{{ remote_home_dir }}"
+        state: present #default state

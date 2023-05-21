@@ -1,0 +1,9 @@
+mongodb-infra/terraform/.terraform/*
+mongodb-infra/terraform/terraform.tfstate.backup
+mongodb-infra/terraform/.terraform.lock.hcl
+mongodb-infra/terraform/terraform.tfstate
+
+conduit-infra/terraform/.terraform/*
+conduit-infra/terraform/terraform.tfstate.backup
+conduit-infra/terraform/.terraform.lock.hcl
+conduit-infra/terraform/terraform.tfstate

@@ -1,0 +1,5 @@
+cidr_block = "10.0.0.0/16"
+cidr_subnet = "10.0.1.0/24"
+tag_name = "dev"
+key_path = "/home/malu/.ssh/id_rsa.pub"
+image_name = "ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20230516"
