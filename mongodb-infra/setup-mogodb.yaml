@@ -5,27 +5,18 @@
   become: yes
   tasks:
     - name: Upate package manager and install python3
-      # vars:
-      #   ansible_python_interpreter: /usr/bin/python
       ansible.builtin.apt:
         name:
           - python3
         update_cache: yes
         state: present
     - name: install Docker
-      # vars:
-      #   ansible_python_interpreter: /usr/bin/python
       ansible.builtin.apt:
         name:
           - docker
           - docker-compose
           - pip
         state: present
-    # - name: downnload and install Docekr compose
-    #   ansible.builtin.get_url:
-    #     url: "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-Linux-{{lookup('pipe','uname -m')}}"
-    #     dest: /usr/local/bin/docker-compose
-    #     mode: +x
     - name: install docker-python
       ansible.builtin.pip:
         name: 
@@ -66,12 +57,6 @@
       ansible.builtin.copy:
         src: "{{ file_path }}"
         dest: "{{ remote_home_dir }}"
-    # - name: docker login
-    #   community.docker.docker_login: 
-    #     registry_url: "{{ registry_url }}"
-    #     username: "{{ username }}"
-    #     password: "{{ password }}"
-    #     reauthorize: yes
     - name: start containers
       community.docker.docker_compose:
         project_src: "{{ remote_home_dir }}"

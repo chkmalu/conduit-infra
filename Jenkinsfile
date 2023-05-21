@@ -1,14 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_REPO = "081241791096.dkr.ecr.us-east-1.amazonaws.com"
-        IMAGE_NAME = "seamlesshr"
-        IMAGE_TAG = '1.0'
-        STATUS = false;
-
-    }
-
     stages {
         stage('TERRAFORM PLAN') {
             steps {
@@ -22,8 +14,20 @@ pipeline {
         stage('TERRAFORM APPLY') {
             steps {
                 echo 'DEPLOYING INFRASTRUCTURE'
-                dir('tconduit-infra') {
+                dir('conduit-infra') {
                     sh 'terraform apply -auto-approve'
+                }
+            }
+        }
+        stage('DEPLOY PROMETHEUS-MONITORING') {
+            steps {
+                echo 'DEPLOYING PROMETHEUS-MONITORING'
+                script{
+                    sh 'helm repo add prometheus-community https://prometheus-community.github.io/helm-charts'
+                    sh 'helm repo update'
+                    sh 'kubectl create namespace monitoring'
+                    sh 'helm install monitoring prometheus-community/prometheus -n monitoring'
+                    sh 'kubectl get all -n monitoring'
                 }
             }
         }
